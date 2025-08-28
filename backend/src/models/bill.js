@@ -40,6 +40,7 @@ const billSchema = new mongoose.Schema(
       },
     ],
     totalAmount: { type: Number, required: [true, "Total Amount is required"] },
+    totalItems: { type: Number, required: [true, "Total number of Items is required"] },
   },
   {
     timestamps: true,

@@ -58,6 +58,7 @@ function billInputValidation(customerName, items) {
 
 function calculateBillItems(items) {
   let totalAmount = 0;
+  let totalItems = 0;
   const calculatedItems = items.map((item) => {
     const name = item.name || "";
     const quantity = Number(item.quantity) || 0;
@@ -69,11 +70,12 @@ function calculateBillItems(items) {
 
     const sellingPrice = quantity * price * (1 - discount / 100);
     totalAmount += sellingPrice;
+    totalItems += quantity;
 
     return { name, quantity, price, discount, sellingPrice };
   });
 
-  return { calculatedItems, totalAmount };
+  return { calculatedItems, totalAmount, totalItems };
 }
 
 // Route for TEST
@@ -92,12 +94,13 @@ router.post("/create", async (req, res, next) => {
       return res.status(400).json(new ApiResponse(400, inputValidationErrors, "Input validation failed"));
     }
 
-    const { calculatedItems, totalAmount } = calculateBillItems(items);
+    const { calculatedItems, totalAmount, totalItems } = calculateBillItems(items);
 
     const bill = new Bill({
       customerName,
       items: calculatedItems,
       totalAmount,
+      totalItems,
     });
     const savedBill = await bill.save();
 
