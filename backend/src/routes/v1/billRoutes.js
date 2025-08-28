@@ -76,10 +76,12 @@ function calculateBillItems(items) {
   return { calculatedItems, totalAmount };
 }
 
+// Route for TEST
 router.post("/test", (req, res) => {
   res.json(req.body);
 });
 
+// Route for CREATE NEW BILL
 router.post("/create", async (req, res, next) => {
   try {
     const { customerName, items } = req.body;
@@ -108,6 +110,38 @@ router.post("/create", async (req, res, next) => {
 
     // Unexpected error
     // return next(new ApiError(500, error.message || "Failed to create bill"));
+    return next(error);
+  }
+});
+
+// Route for FETCH ALL BILLS
+router.get("/all", async (req, res, next) => {
+  try {
+    const limit = parseInt(req.query.limit) || 10;
+    const page = parseInt(req.query.page) || 1;
+    const sort = {};
+
+    if (req.query.sort === "default" || req.query.sort === undefined) sort.createdAt = -1;
+    else if (req.query.sort === "higestamount") sort.totalAmount = -1;
+    else if (req.query.sort === "lowestamount") sort.totalAmount = 1;
+
+    const bills = await Bill.find()
+      .sort(sort)
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    const totalBills = await Bill.countDocuments();
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          { bills, pagination: { total: totalBills, limit, page, totalPages: Math.ceil(totalBills / limit) } },
+          "Bills fetched successfully"
+        )
+      );
+  } catch (error) {
     return next(error);
   }
 });
