@@ -172,4 +172,24 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
+// Route for DELETE BILL BY ID
+router.delete("/delete/:id", async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const deletedBill = await Bill.findByIdAndDelete(id);
+
+    if (!deletedBill) {
+      return res.status(404).json(new ApiResponse(404, null, "Bill not found"));
+    }
+
+    return res.status(200).json(new ApiResponse(200, deletedBill, "Bill deleted successfully"));
+  } catch (error) {
+    // invalid ObjectId error
+    if (error.name === "CastError") {
+      return res.status(400).json(new ApiResponse(400, { input: req.params.id }, "Invalid bill ID"));
+    }
+    return next(error);
+  }
+});
+
 module.exports = router;
