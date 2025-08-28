@@ -149,4 +149,27 @@ router.get("/all", async (req, res, next) => {
   }
 });
 
+// Route for FETCH SINGLE BILL BY ID
+router.get("/:id", async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const bill = await Bill.findById(id);
+
+    if (!bill) {
+      return res.status(404).json(new ApiResponse(404, null, "Bill not found"));
+    }
+
+    return res.status(200).json(new ApiResponse(200, bill, "Bill fetched successfully"));
+  } catch (error) {
+    // console.error(error);
+
+    // invalid ObjectId error
+    if (error.name === "CastError") {
+      return res.status(400).json(new ApiResponse(400, { input: req.params.id }, "Invalid bill ID"));
+    }
+
+    return next(error);
+  }
+});
+
 module.exports = router;
