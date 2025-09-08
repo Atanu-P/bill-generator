@@ -2,6 +2,7 @@ const router = require("express").Router();
 const Bill = require("../../models/bill");
 const ApiResponse = require("../../utils/ApiResponse");
 const ApiError = require("../../utils/ApiError");
+const generateBillPdf = require("../../utils/generateBillPdf");
 
 function billInputValidation(customerName, items) {
   const validationErrors = [];
@@ -27,7 +28,7 @@ function billInputValidation(customerName, items) {
         itemIndex: index,
         field: "quantity",
         message: "Quantity is required and must be a number >= 1",
-        input: item.quantity || "empty",
+        input: item.quantity === 0 ? 0 : item.quantity || "empty",
       });
     }
 
@@ -36,7 +37,7 @@ function billInputValidation(customerName, items) {
         itemIndex: index,
         field: "price",
         message: "Price is required and must be a number > 0",
-        input: item.price || "empty",
+        input: item.price === 0 ? 0 : item.price || "empty",
       });
     }
 
@@ -47,7 +48,7 @@ function billInputValidation(customerName, items) {
           itemIndex: index,
           field: "discount",
           message: "Discount must be a number between 0 and 100",
-          input: discount,
+          input: item.discount,
         });
       }
     }
@@ -188,6 +189,77 @@ router.delete("/delete/:id", async (req, res, next) => {
     if (error.name === "CastError") {
       return res.status(400).json(new ApiResponse(400, { input: req.params.id }, "Invalid bill ID"));
     }
+    return next(error);
+  }
+});
+
+// Route for UPDATE BILL BY ID
+router.put("/update/:id", async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const { customerName, items } = req.body;
+
+    const bill = await Bill.findById(id);
+
+    if (!bill) {
+      return res.status(404).json(new ApiResponse(404, null, "Bill not found"));
+    }
+
+    // Validate input
+    const inputValidationErrors = billInputValidation(customerName, items);
+    if (inputValidationErrors.length > 0) {
+      return res.status(400).json(new ApiResponse(400, inputValidationErrors, "Input validation failed"));
+    }
+
+    // Calculate updated bill values
+    const { calculatedItems, totalAmount, totalItems } = calculateBillItems(items);
+
+    // update bill by id
+    const updatedBill = await Bill.findByIdAndUpdate(
+      id,
+      {
+        customerName,
+        items: calculatedItems,
+        totalAmount,
+        totalItems,
+      },
+      { new: true, runValidators: true }
+    );
+
+    return res.status(200).json(new ApiResponse(200, updatedBill, "Bill updated successfully"));
+  } catch (error) {
+    if (error.name === "ValidationError") {
+      const errors = Object.values(error.errors).map((e) => e.message);
+      return res.status(400).json(new ApiResponse(400, { errors }, "Mongoose Validation failed"));
+    }
+
+    if (error.name === "CastError") {
+      return res.status(400).json(new ApiResponse(400, { input: req.params.id }, "Invalid bill ID"));
+    }
+
+    return next(error);
+  }
+});
+
+// Route for GENERATE BILL PDF BY ID
+router.get("/generate-pdf/:id", async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const bill = await Bill.findById(id);
+
+    if (!bill) {
+      return res.status(404).json(new ApiResponse(404, null, "Bill not found"));
+    }
+
+    const pdfBuffer = await generateBillPdf(bill);
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", "inline; filename=bill.pdf");
+    res.status(200).send(pdfBuffer);
+  } catch (error) {
+    if (error.name === "CastError") {
+      return res.status(400).json(new ApiResponse(400, { input: req.params.id }, "Invalid bill ID"));
+    }
+
     return next(error);
   }
 });
