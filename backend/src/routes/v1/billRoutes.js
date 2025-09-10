@@ -60,11 +60,14 @@ function billInputValidation(customerName, items) {
 function calculateBillItems(items) {
   let totalAmount = 0;
   let totalItems = 0;
+  let originalAmount = 0;
+  let totalSavings = 0;
+
   const calculatedItems = items.map((item) => {
     const name = item.name || "";
     const quantity = Number(item.quantity) || 0;
     const price = Number(item.price) || 0;
-    let discount = item.discount === undefined || item.discount === null ? 0 : Number(item.discount);
+    let discount = item.discount === undefined || item.discount === null || item.discount < 0 ? 0 : Number(item.discount);
 
     // if (discount < 0) discount = 0;
     // if (discount > 100) discount = 100;
@@ -73,10 +76,15 @@ function calculateBillItems(items) {
     totalAmount += sellingPrice;
     totalItems += quantity;
 
-    return { name, quantity, price, discount, sellingPrice };
+    const noDiscountPrice = quantity * price;
+    originalAmount += noDiscountPrice;
+
+    return { name, quantity, price, discount, sellingPrice, originalAmount };
   });
 
-  return { calculatedItems, totalAmount, totalItems };
+  totalSavings = originalAmount - totalAmount;
+
+  return { calculatedItems, totalAmount, totalItems, totalSavings };
 }
 
 // Route for TEST
@@ -95,13 +103,14 @@ router.post("/create", async (req, res, next) => {
       return res.status(400).json(new ApiResponse(400, inputValidationErrors, "Input validation failed"));
     }
 
-    const { calculatedItems, totalAmount, totalItems } = calculateBillItems(items);
+    const { calculatedItems, totalAmount, totalItems, totalSavings } = calculateBillItems(items);
 
     const bill = new Bill({
       customerName,
       items: calculatedItems,
       totalAmount,
       totalItems,
+      totalSavings,
     });
     const savedBill = await bill.save();
 
@@ -212,7 +221,7 @@ router.put("/update/:id", async (req, res, next) => {
     }
 
     // Calculate updated bill values
-    const { calculatedItems, totalAmount, totalItems } = calculateBillItems(items);
+    const { calculatedItems, totalAmount, totalItems, totalSavings } = calculateBillItems(items);
 
     // update bill by id
     const updatedBill = await Bill.findByIdAndUpdate(
@@ -222,6 +231,7 @@ router.put("/update/:id", async (req, res, next) => {
         items: calculatedItems,
         totalAmount,
         totalItems,
+        totalSavings,
       },
       { new: true, runValidators: true }
     );
