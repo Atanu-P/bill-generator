@@ -3,7 +3,7 @@
 NodeJS (Express) based Backend API server for the Bill-generator app, this is a REST API to create, fetch, update, delete & generate PDFs for bills. Server calculate selling prices and total amount based on input quantity & price of product while bill creation and save it to database.
 
 - [List of Routes](#routes)
-- [Installation & Setup](#installation-&-setup)
+- [Installation and Setup](#Installation-and-Setup)
 - [Start Server](#Running-the-Project-and-Start-Express-server)
 
 ## Base URL
@@ -106,7 +106,7 @@ API routes below are mounted under `/api/v1/bill` in the project
 	]
 }
 ```
-## Installation & Setup
+## Installation and Setup
 
 ### Prerequisites
 - Node.js (v14.x or above)
