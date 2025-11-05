@@ -4,7 +4,7 @@ NodeJS (Express) based Backend API server for the Bill-generator app, this is a 
 
 - [List of Routes](#routes)
 - [Installation and Setup](#Installation-and-Setup)
-- [Start Server](#Running-the-Project-and-Start-Express-server)
+- [Starting Server](#Running-the-Project-and-Start-Express-server)
 
 ## Base URL
 
@@ -24,7 +24,7 @@ API routes below are mounted under `/api/v1/bill` in the project
      - `customerName` (string)
      - `items` (array of item objects)
    
-   - Request body JSON example [CLICK HERE](#Request-body-for-creating-or-updating-bill)
+   - Request body JSON example [CLICK HERE](#Request-body-for-creating-a-bill-or-updating-a-bill)
 
 2. GET `/api/v1/bill/generate-pdf/:id`
    
@@ -63,19 +63,7 @@ API routes below are mounted under `/api/v1/bill` in the project
      ```powershell
      'http://localhost:4000/api/v1/bill/614c0f2e8a3a2b0012345678'
      ```
-
-5. DELETE `/api/v1/bill/delete/:id`
-
-   - Delete a bill by MongoDB ObjectId.
-     ```powershell
-     'http://localhost:4000/api/v1/bill/delete/:id'
-     ```
-   - Example:
-     ```powershell
-     'http://localhost:4000/api/v1/bill/delete/614c0f2e8a3a2b0012345678' 
-     ```
-
-6. PUT `/api/v1/bill/update/:id`
+5. PUT `/api/v1/bill/update/:id`
 
    - Update an existing bill (customerName & items). Input is validated and totals recalculated.
      ```powershell
@@ -85,8 +73,18 @@ API routes below are mounted under `/api/v1/bill` in the project
      ```powershell
      'http://localhost:4000/api/v1/bill/update/614c0f2e8a3a2b0012345678'
      ```
-   - Request body JSON example [CLICK HERE](#Request-body-for-creating-or-updating-bill)
-    
+   - Request body JSON example [CLICK HERE](#Request-body-for-creating-a-bill-or-updating-a-bill)
+
+6. DELETE `/api/v1/bill/delete/:id`
+
+   - Delete a bill by MongoDB ObjectId.
+     ```powershell
+     'http://localhost:4000/api/v1/bill/delete/:id'
+     ```
+   - Example:
+     ```powershell
+     'http://localhost:4000/api/v1/bill/delete/614c0f2e8a3a2b0012345678' 
+     ```
 
 ### Request body for creating a bill or updating a bill
 ```json
@@ -117,14 +115,13 @@ API routes below are mounted under `/api/v1/bill` in the project
 
 ### Node.js Installation
 1. Download the Node.js installer from the [official website](https://nodejs.org/).
-2. Run the installer and follow the instructions.
-3. Verify the installation by running the following commands in your terminal:
+2. Run the installer and then verify the installation by running the following commands in your terminal:
     ```bash
     node -v
     npm -v
     ```
-4. Download and install MongoDB Community Server from the [official website](https://www.mongodb.com/try/download/community).
-5. Download and install Compass (MongoDB GUI) from [official website](https://www.mongodb.com/try/download/compass).
+3. Download and install MongoDB Community Server from the [official website](https://www.mongodb.com/try/download/community).
+4. Download and install Compass (MongoDB GUI) from [official website](https://www.mongodb.com/try/download/compass).
 
 ### Clone the Repository
 1. Download and install GIT from [official website](https://git-scm.com/downloads/win).
@@ -143,8 +140,8 @@ API routes below are mounted under `/api/v1/bill` in the project
     ```
 
 ### Running the Project and Start Express server
-1. Start the server using the following command:
+1. Start the server using the following command in the backend folder inside the project directory :
     ```bash
-    cd backend && npm start
+    npm start
     ```
-2. The server should now be running on `http://localhost:4000`.
+2. The Express server should now be running on `http://localhost:4000`.
