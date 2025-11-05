@@ -1,6 +1,6 @@
 # Bill Generator API
 
-NodeJS (Express) based Backend API server for the Bill-generator app, this is a REST API to create, fetch, update, delete & generate PDFs for bills. Server calculate selling prices and total amount based on input quantity & price of product while bill creation and save it to database.
+NodeJS (Express) based Backend API server for the Bill-generator app, this is a REST API to create, fetch, update, delete & generate PDFs for bills. Server calculates selling prices and total amount based on input quantity & price of product while bill creation and saves it to the database.
 
 - [List of Routes](#routes)
 - [Installation and Setup](#Installation-and-Setup)
@@ -16,7 +16,7 @@ API routes below are mounted under `/api/v1/bill` in the project
 
 1. POST `/api/v1/bill/create`
 
-   - Create a new bill. Server validates inputs, calculate selling prices and total amount based on quantity and price, then saves to database.
+   - Create a new bill. Server validates inputs, calculates selling prices and total amount based on quantity and price, then saves to the database.
      ```powershell
      'http://localhost:4000/api/v1/bill/create'
      ```
@@ -26,9 +26,20 @@ API routes below are mounted under `/api/v1/bill` in the project
    
    - Request body JSON example [CLICK HERE](#Request-body-for-creating-or-updating-bill)
 
-2. GET `/api/v1/bill/all`
+2. GET `/api/v1/bill/generate-pdf/:id`
+   
+   - Generate a PDF for a single bill (returns `application/pdf`).
+     ```powershell
+     'http://localhost:4000/api/v1/bill/generate-pdf/:id'
+     ```
+   - Example :
+     ```powershell    
+     'http://localhost:4000/api/v1/bill/generate-pdf/614c0f2e8a3a2b0012345678'
+     ```
 
-   - Fetch paginated list of bills with sorting.
+3. GET `/api/v1/bill/all`
+
+   - Fetch a paginated list of bills with sorting.
      ```powershell
      'http://localhost:4000/api/v1/bill/all'
      ```
@@ -37,7 +48,7 @@ API routes below are mounted under `/api/v1/bill` in the project
      - `page` (number) — page number for pagination (default 1)
      - `sort` (string) — `default` (sort by newest date), `higestamount` (sort by highest totalAmount), `lowestamount` (sort by lowest totalAmount)
    
-   - Example with pagination and sorting with limit query parameter:
+   - Example with pagination and sorting with a limit query parameter:
      ```powershell
      'http://localhost:4000/api/v1/bill/all?limit=5&page=1&sort=higestamount'
      ```
@@ -76,17 +87,8 @@ API routes below are mounted under `/api/v1/bill` in the project
      ```
    - Request body JSON example [CLICK HERE](#Request-body-for-creating-or-updating-bill)
     
-7. GET `/api/v1/bill/generate-pdf/:id`
-   
-   - Generate a PDF for the bill (returns `application/pdf`).
-     ```powershell
-     'http://localhost:4000/api/v1/bill/generate-pdf/:id'
-     ```
-   - Example :
-     ```powershell    
-     'http://localhost:4000/api/v1/bill/generate-pdf/614c0f2e8a3a2b0012345678'
-     ```
-### Request body for creating or updating bill
+
+### Request body for creating a bill or updating a bill
 ```json
 {
 	"customerName": "Atanu Pal",
@@ -98,7 +100,7 @@ API routes below are mounted under `/api/v1/bill` in the project
 			"price": "80"
 		},
 		{
-			"name": "Cadbury Dairy milk",
+			"name": "Cadbury Dairy Milk",
 			"quantity": "4",
 			"discount": "5",
 			"price": "20"
@@ -131,11 +133,11 @@ API routes below are mounted under `/api/v1/bill` in the project
     ```bash
     git clone https://github.com/Atanu-P/bill-generator.git
     ```
-4. Navigate to the backend folder inside project directory to install required dependencies:
+4. Navigate to the backend folder inside the project directory to install required dependencies:
     ```bash
     cd bill-generator && cd backend
     ```
-5. Install the required Node.js dependencies, all the dependencies listed in `package.json` file within backend folder:
+5. Install the required Node.js dependencies, all the dependencies listed in `package.json` file within the backend folder:
     ```bash
     npm install
     ```
